@@ -52,5 +52,3 @@ def read():
 if __name__ == '__main__':
     data = read()
     print("len data:", len(data))
-    # for item in data:
-    #     print(item)
