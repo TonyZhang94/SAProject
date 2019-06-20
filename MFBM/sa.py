@@ -13,6 +13,7 @@ class Match(object):
         self.opinions = lexicon.get_opinions()
 
     def match(self):
+        # data = [['实物没问题很好。', [[0, 2]]]]
         data = read()
         win_size = self.win_size
         result = list()
@@ -40,7 +41,7 @@ class Match(object):
                         # bw > fw
                         # bw
                         if range_size <= len(bw_text):
-                            word = bw_text[turn: range_size]
+                            word = bw_text[turn: turn + range_size]
                             if word in self.opinions:
                                 find = True
                                 opi = word
@@ -61,13 +62,54 @@ class Match(object):
 
                 opis.append([pos, opi, ori])
             result.append([text, opis])
+            # if len(result) > 100:
+            #     return result
 
         return result
 
+    def make_inputs(self, data, s1=0.8, s2=0.1, s3=0.1):
+        inputs = list()
+        win_size = self.win_size
+        for comment in data:
+            text, positions = comment
+            for pos in positions:
+                p1, p2 = pos[0]
+                try:
+                    opi = self.opinions[pos[1]]
+                    if opi not in [-1, 0, 1]:
+                        continue
+                except KeyError:
+                    continue
+                start = max(p1 - win_size, 0)
+                end = min(p2 + win_size, len(text))
+                if -1 == opi:
+                    label = [1, 0, 0]
+                elif 0 == opi:
+                    label = [0, 1, 0]
+                else:
+                    label = [0, 0, 1]
+                inputs.append([text[start: end], label])
+        
+        size = len(inputs)
+        p1 = int(size*s1)
+        p2 = int(size*s2) + p1
+        p3 = int(size*s3) + p2
+
+        train = inputs[: p1]
+        test = inputs[p1: p2]
+        dev = inputs[p2: p3]
+        print("all data size", size)
+        print("train size", len(train))
+        print("test size", len(test))
+        print("dev size", len(dev))
+
+        return train, test, dev
+
 
 if __name__ == '__main__':
-    # ['实物没问题很好。', [[[0, 2], '', '']]]
     obj = Match(5)
     result = obj.match()
-    for item in result:
+    result = result[: 100]
+    inputs, _, _ = obj.make_inputs(result)
+    for item in inputs:
         print(item)

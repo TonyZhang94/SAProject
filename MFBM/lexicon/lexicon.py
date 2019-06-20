@@ -82,7 +82,7 @@ class GetLexicon(object):
         self.chars = None
         self.bounder = None
 
-        self.path = "lexicon/"
+        self.path = "MFBM/lexicon/"
 
     def read(self, file):
         self.store[file] = set()

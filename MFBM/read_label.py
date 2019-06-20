@@ -3,7 +3,7 @@
 
 def read():
     data = list()
-    file = "../data/label_test"
+    file = "data/label_test"
     with open(file, mode="r", encoding="utf-8") as fp:
         lines = fp.readlines()
         chs, pos = list(), list()
